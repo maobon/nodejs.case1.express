@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hero - Admin</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <style>
+        .hero-list img {
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="page-header container">
+        <h1>王者荣耀
+            <small>英雄管理器</small>
+        </h1>
+    </div>
+</header>
+
+<div class="container hero-list">
+
+    <form id="form">
+        <!-- id 和 原始avatar 使用隐藏域记录 -->
+        <input type="hidden" name="id" value="<@= hero.id @>">
+        <input type="hidden" name="origin_avatar" value="<@= hero.avatar @>">
+
+        <!-- 英雄名称 -->
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">英雄名称</label>
+            <div class="col-sm-10">
+                <input type="text" name="name" class="form-control" id="inputEmail3" placeholder="Email"
+                       value="<@= hero.name @>">
+            </div>
+        </div>
+
+        <!-- 性别 -->
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">性别</label>
+            <div class="col-sm-10">
+                <@ if (hero.gender === '男'){ @>
+                <label class="radio-inline">
+                    <input type="radio" name="gender" checked id="inlineRadio1" value="男"> 男
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="gender" id="inlineRadio2" value="女"> 女
+                </label>
+                <@ }else{ @>
+                <label class="radio-inline">
+                    <input type="radio" name="gender" id="inlineRadio1" value="男"> 男
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="gender" checked id="inlineRadio2" value="女"> 女
+                </label>
+                <@ } @>
+            </div>
+        </div>
+
+        <!-- 头像 -->
+        <div class="form-group">
+            <!-- 隐藏域 设置到value上 -->
+            <input type="hidden" id="avatar_src" name="avatar_src" value="">
+            <label for="inputPassword3" class="col-sm-2 control-label">头像</label>
+            <div class="col-sm-10">
+                <img src="<@= hero.avatar @>" alt="" id="perview_headpic">
+                <input type="file" name="avatar" id="avatar">
+            </div>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">保存修改</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script src="/node_modules/jquery/dist/jquery.js"></script>
+<script>
+
+    $("#avatar").on('change', function () {
+
+        var headPhotoForm = new FormData();
+        headPhotoForm.append('avatar', $(this)[0].files[0]);
+
+        $.ajax({
+            url: '/upload',
+            type: 'post',
+            dataType: 'json',
+            data: headPhotoForm,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (parseInt(data.err_code) === 0) {
+                    // 展示上传成功的头像
+                    $("#perview_headpic").attr('src', data.result);
+                    // 设置到隐藏域上 为提交做准备
+                    $("#avatar_src").val(data.result);
+                }
+            }
+        })
+    })
+
+
+    $('#form').on('submit', function (e) {
+        e.preventDefault();
+
+        var formData = new FormData($('#form')[0]);
+
+        $.ajax({
+            url: '/edit',
+            type: 'post',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function (data) {
+                if (data.err_code === 0) {
+                    window.location.href = '/'
+                }
+            }
+        });
+    })
+</script>
+</body>
+
+</html>
+

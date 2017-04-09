@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hero - Admin</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <style>
+        .hero-list img {
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="page-header container">
+        <h1><a href="/">王者荣耀</a>
+            <small>英雄管理器 <@= title @></small>
+        </h1>
+    </div>
+</header>
+<div class="container hero-list">
+
+    <!-- 
+      没有文件的普通表单 POST 提交
+        表单会把数据以查询字符串（放到请求体）的形式发送给服务端
+        由于表单 post 提交可能会有大量的数据，所以表单可能会分段发送多次表单数据到服务端
+     -->
+
+    <!-- 表单的默认提交事件和下面两个属性相关 同步提交 自己手动使用jQuery提交时下面的属性无意义 -->
+    <!-- 如果表单需要提交图片 必须设置 enctype="multipart/form-data" -->
+    <form id="form">
+        <!-- 名称 -->
+        <div class="form-group">
+            <label for="exampleInputEmail1">英雄名称</label>
+            <input type="text" name="name" class="form-control" id="exampleInputEmail1" placeholder="请输入英雄名称">
+        </div>
+
+        <!-- 性别 -->
+        <div class="form-group">
+            <label for="exampleInputPassword1">英雄性别</label>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="gender" id="optionsRadios1" value="男" checked>男
+                </label>
+                <label>
+                    <input type="radio" name="gender" id="optionsRadios2" value="女">女
+                </label>
+            </div>
+        </div>
+
+        <!-- 头像 -->
+        <div class="form-group">
+            <!-- 隐藏域 设置到value上 -->
+            <input type="hidden" id="avatar_src" name="avatar_src" value="">
+            <label for="exampleInputFile">英雄图片</label>
+            <img src="" alt="头像预览" style="width: 80px;height: 80px;" id="perview_headpic">
+            <!-- 别忘了加上 name属性 向服务端提交的key -->
+            <input type="file" id="avatar" name="avatar">
+            <p class="help-block">请上传英雄图片.</p>
+        </div>
+
+        <!-- 提交按钮 -->
+        <button type="submit" class="btn btn-success">点击保存</button>
+    </form>
+</div>
+
+<script src="/node_modules/jquery/dist/jquery.js"></script>
+<script>
+
+    /**
+     * 头像预览功能 需客户端上传头像至服务端
+     * 使用FormData对象与ajax 进行异步提交上传文件的操作
+     */
+    $("#avatar").on('change', function () {
+
+        var headPhotoForm = new FormData();
+        headPhotoForm.append('avatar', $(this)[0].files[0]);
+
+        $.ajax({
+            url: '/upload',
+            type: 'post',
+            dataType: 'json',
+            data: headPhotoForm,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (parseInt(data.err_code) === 0) {
+                    // data.result;
+                    // console.log('result = ' + data.result);
+
+                    $("#perview_headpic").attr('src', data.result);
+                    $("#avatar_src").val(data.result);
+                }
+            }
+        })
+    })
+
+
+    /**
+     * 表单提交操作
+     * 不提交头像文件 只提交该头像在服务端上的路径
+     */
+    $('#form').on('submit', function (e) {
+        // 禁用表单的默认提交行为
+        e.preventDefault();
+
+        // avatar_src的value不为空 表示头像上传成功 可以进行后续提交操作
+        if ($("#avatar_src").val()) {
+
+            var formData = new FormData($("#form")[0]);
+            formData.delete('avatar');
+
+            $.ajax({
+                url: '/add',
+                type: 'post',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.err_code === 0) {
+                        window.location.href = '/';
+                    }
+                }
+            })
+        } else {
+            window.alert('请上传你的头像');
+        }
+
+
+        // 全新的API
+        // XMLHttpRequest2 新增的 FormData对象 支持异步上传文件
+
+        // 使用FormData手动组件表单
+        // var formData = new FormData();
+        // formData.append('name', "辛奕");
+        // formData.append('gender', "28");
+        // formData.append('avatar', $("#avatar")[0].files[0]);
+
+        // 基于表单Form dom对象 构建formData
+        // 还可以直接传一个表单的DOM对象 到FormData的构造函数中
+//        var formData = new FormData($("#form")[0]);
+
+        // 自己手动控制提交
+//        $.ajax({
+//            url: '/add',
+//            type: 'post',
+//            data: formData,
+//            processData: false, // 阻止jQuery默认数据处理
+//            contentType: false, // 阻止jQuery默认数据处理
+//            dataType: 'json',
+//            success: function (data) {
+//                if (data.err_code === 0) {
+//                    window.location.href = '/';
+//                }
+//            }
+//        })
+
+    })
+</script>
+</body>
+
+</html>
+

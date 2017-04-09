@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hero - Admin</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <style>
+        .hero-list img {
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="page-header container">
+        <h1><a href="/">王者荣耀</a>
+            <small>英雄管理器</small>
+        </h1>
+    </div>
+</header>
+<div class="container hero-list">
+    <a class="btn btn-success pull-right" href="/add">添加英雄</a>
+    <table class="table table-hover">
+        <thead>
+        <th>编号</th>
+        <th>名称</th>
+        <th>性别</th>
+        <th>头像</th>
+        <th>操作</th>
+        </thead>
+        <tbody id="containerId">
+        <@ for(var i = 0; i < list.length; i++){ @>
+        <tr>
+            <td><@= list[i].id @></td>
+            <td><@= list[i].name @></td>
+            <td><@= list[i].gender @></td>
+            <td><img src="<@= list[i].avatar @>" alt=""></td>
+
+            <td>
+                <a href="/info?id=<@= list[i].id @>">查看</a>
+                <a href="/edit?id=<@= list[i].id @>">编辑</a>
+                <a href="/delete?id=<@= list[i].id @>" class="btn-delete">删除</a>
+            </td>
+        </tr>
+        <@ } @>
+        </tbody>
+    </table>
+</div>
+
+<script src="/node_modules/jquery/dist/jquery.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.js"></script>
+<script src="/node_modules/art-template/dist/template-native.js"></script>
+
+<script type="text/template" id="templateId">
+    <% heros.forEach(function(item){ %>
+    <tr>
+        <td><%= item.id %></td>
+        <td><%= item.name %></td>
+        <td><%= item.gender %></td>
+
+        <td><img src="<%= item.avatar %>" alt=""></td>
+        <td>
+            <a href="/info?id=<%= item.id %>">查看</a>
+            <a href="/edit?id=<%= item.id %>">编辑</a>
+            <a href="/delete?id=<%= item.id %>" class="btn-delete">删除</a>
+        </td>
+    </tr>
+    <% }) %>
+</script>
+
+<script>
+    window.onload = function () {
+
+        /**
+         * 绑定事件代理 父容器绑定
+         * 该绑定操作发生在服务端渲染页面之后 首次请求页面是由服务端直接渲染完成发送给客户端呈现
+         * #containerId > class='btn-delete' 给删除按钮绑定事件
+         *
+         * 异步请求删除页面上的数据
+         * 点击删除按钮 -> ajax发送删除请求 -> 服务端逻辑删除库中的数据 -> 通知客户端删除完成 -> 客户端再次请求查库 -> 渲染为全新数据
+         * 整个流程没有发生页面的整体刷新 有比较好的用户体验
+         */
+        $("#containerId").on('click', '.btn-delete', function (e) {
+            e.preventDefault();
+
+            // 获取带有查询字符串的请求路径
+            var url = $(this).attr('href');
+
+            // 提交删除该item请求
+            $.ajax({
+                type: 'get',
+                url: url,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.err_code === 0) {
+                        // 服务端删除数据库中的数据 成功后err_code为0 通知客户端删除完成
+                        // 客户端重新请求局部渲染生成全新的内容部分 重新请求服务端查库
+                        rerender();
+                    }
+                }
+            })
+        })
+
+        /**
+         * 重新渲染生成内容部分
+         */
+        function rerender() {
+            $.ajax({
+                type: 'get',
+                url: '/checkall',
+                dataType: 'json',
+                success: function (data) {
+                    data = data.result;
+                    var html = template('templateId', data);
+                    $("#containerId").html(html);
+                }
+            })
+        }
+
+    };
+</script>
+
+</body>
+</html>
+
