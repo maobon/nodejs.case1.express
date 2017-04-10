@@ -5,10 +5,13 @@
  */
 
 var express = require('express');
-
 var heroCtrl = require('../controllers/heroctrl');
 
+// 获取路由实例
 var router = express.Router();
+
+// 配置路由 .get()是GET请求 .post()是POST请求
+// 参数2 为回调函数 执行请求URL标识符对应的handler
 
 router
 // 首页

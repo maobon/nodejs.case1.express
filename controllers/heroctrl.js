@@ -9,6 +9,7 @@ var path = require('path');
 var formidable = require('formidable');
 var heroModel = require('../models/heroMod');
 
+
 /**
  * 显示首页
  */
@@ -28,8 +29,10 @@ exports.showIndex = function (req, res) {
     })
 };
 
+
 /**
- * 查看某位英雄的信息
+ * 查看
+ * 某位英雄的信息
  */
 exports.showHeroInfo = function (req, res) {
 
@@ -55,7 +58,9 @@ exports.showHeroInfo = function (req, res) {
 
 
 /**
- * 编辑某位英雄的信息
+ * 编辑 展示编辑页面
+ * 首先需要查库 在当前页面中展示出当前该位英雄的信息
+ * 某位英雄的信息
  */
 exports.showEditHeroInfo = function (req, res) {
 
@@ -78,8 +83,11 @@ exports.showEditHeroInfo = function (req, res) {
     })
 };
 
+
 /**
- * 编辑某一位英雄的信息
+ * 编辑
+ * 某一位英雄的信息
+ * 修改完成后整体提交该位英雄的信息
  */
 exports.doEditHeroInfo = function (req, res) {
     // formidable 插件
@@ -140,12 +148,8 @@ exports.showAdd = function (req, res) {
  * 添加一位
  */
 exports.doAdd = function (req, res) {
-
     // formidable插件 处理带有文件的表单上传
     var form = new formidable.IncomingForm();
-
-    // form.uploadDir = "./img/"; // 配置上传的文件保存路径
-    // form.keepExtensions = true; // 保持文件扩展名
 
     // 获取客户端传递过来的参数
     form.parse(req, function (err, fields, files) {

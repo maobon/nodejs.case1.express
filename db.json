@@ -1,20 +1,11 @@
 {
   "heros": [
     {
-      "name": "意义",
+      "name": "毛子",
       "gender": "女",
-      "avatar_src": "",
-      "avatar": "public/upload/upload_a37dd2cb4a769222a3e6ee7188449f56.jpg",
-      "id": 1,
-      "origin_avatar": "public/upload/upload_a37dd2cb4a769222a3e6ee7188449f56.jpg"
-    },
-    {
-      "name": "位于语言",
-      "gender": "女",
-      "avatar_src": "/public/upload/upload_1c4955306902334a3bd7b629eea18c67.jpg",
-      "avatar": "public/upload/upload_98889e32e4281dfaa9091ea7605bdb73.jpg",
-      "id": 2,
-      "origin_avatar": "public/upload/upload_49c72bb80c3e39adf521c3c1731177c4.png"
+      "avatar_src": "/public/upload/upload_006a2db844f8243eb9dae509a74ce8fa.jpg",
+      "avatar": "/public/upload/upload_006a2db844f8243eb9dae509a74ce8fa.jpg",
+      "id": 4
     }
   ]
 }

@@ -77,7 +77,7 @@ exports.queryHeroById = function (id, callback) {
 };
 
 /**
- * 根据该id对应的英雄
+ * 根据该id删除对应的英雄
  *
  * @param id
  * @param callback
